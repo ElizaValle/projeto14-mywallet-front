@@ -1,12 +1,18 @@
 import styled from "styled-components"
 import { BiExit } from "react-icons/bi"
 import { AiOutlineMinusCircle, AiOutlinePlusCircle } from "react-icons/ai"
+import { UserContext } from "../contexts/UserContext"
+import { useContext } from "react"
+import { TransactionContext } from "../contexts/TransactionContext"
 
 export default function HomePage() {
+  const { user } = useContext(UserContext)
+  const { operation } = useContext(TransactionContext)
+
   return (
     <HomeContainer>
       <Header>
-        <h1>Olá, Fulano</h1>
+        <h1>Olá, {user.name}</h1>
         <BiExit />
       </Header>
 
