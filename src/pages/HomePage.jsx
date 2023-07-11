@@ -2,12 +2,31 @@ import styled from "styled-components"
 import { BiExit } from "react-icons/bi"
 import { AiOutlineMinusCircle, AiOutlinePlusCircle } from "react-icons/ai"
 import { UserContext } from "../contexts/UserContext"
-import { useContext } from "react"
+import { useContext, useEffect, useState } from "react"
 import { TransactionContext } from "../contexts/TransactionContext"
+import apiOperations from "../services/apiOperations"
+import { Link } from "react-router-dom"
+import dayjs from "dayjs"
 
-export default function HomePage() {
+export default function HomePage({ value, description }) {
+  const [operations, setOperations] = useState([])
   const { user } = useContext(UserContext)
   const { operation } = useContext(TransactionContext)
+
+  useEffect(getOperationsList, [])  // executa a função uma única vez qdo a tela abre
+
+  function getOperationsList() { 
+    apiOperations.getOperations(user.token)
+    .then(res => {
+      setOperations(res.data)
+    })
+    .catch(err => {
+      if(!user.token) {
+        alert("Faça login!")
+      } else {
+          alert(err.response.data.message)}
+    })
+  }
 
   return (
     <HomeContainer>
@@ -17,23 +36,24 @@ export default function HomePage() {
       </Header>
 
       <TransactionsContainer>
-        <ul>
-          <ListItemContainer>
-            <div>
-              <span>30/11</span>
-              <strong>Almoço mãe</strong>
-            </div>
-            <Value color={"negativo"}>120,00</Value>
-          </ListItemContainer>
-
-          <ListItemContainer>
-            <div>
-              <span>15/11</span>
-              <strong>Salário</strong>
-            </div>
-            <Value color={"positivo"}>3000,00</Value>
-          </ListItemContainer>
-        </ul>
+        {operations.length === 0 ? (
+          <StyledSubtitle>
+            Não há registros de entrada ou saída
+          </StyledSubtitle>
+        ) : (
+          <ul>
+            {operations.map(op => (
+              <ListItemContainer key={op.id}>
+                <div>
+                  <span>{dayjs.date()}/{dayjs.month() + 1}</span>
+                  <strong>{op.description}</strong>
+                </div>
+                <Value color={"negativo"}>{op.value}</Value>
+              </ListItemContainer>
+            ))}
+          </ul>
+        )}
+       
 
         <article>
           <strong>Saldo</strong>
@@ -43,14 +63,19 @@ export default function HomePage() {
 
 
       <ButtonsContainer>
-        <button>
-          <AiOutlinePlusCircle />
-          <p>Nova <br /> entrada</p>
-        </button>
-        <button>
-          <AiOutlineMinusCircle />
-          <p>Nova <br />saída</p>
-        </button>
+        {/* arrumar essa rota */}
+        <Link to="/nova-transacao/:entrada">   
+          <button>
+            <AiOutlinePlusCircle />
+            <p>Nova <br /> entrada</p>
+          </button>
+        </Link>
+        <Link to="/nova-transacao/:saida"> 
+          <button>
+            <AiOutlineMinusCircle />
+            <p>Nova <br />saída</p>
+          </button>
+        </Link>
       </ButtonsContainer>
 
     </HomeContainer>
@@ -124,4 +149,11 @@ const ListItemContainer = styled.li`
     color: #c6c6c6;
     margin-right: 10px;
   }
+`
+const StyledSubtitle = styled.p`
+  margin: 10px 0;
+  font-size: 18px;
+  line-height: 22px;
+  color: #868686;
+  align-self: flex-start;
 `

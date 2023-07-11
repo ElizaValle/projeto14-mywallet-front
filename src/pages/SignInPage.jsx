@@ -24,6 +24,8 @@ export default function SignInPage() {
       console.log(res.data)
       const { id, name, token } = res.data
       setUser({ id, name, token })
+      // localStorage.setItem("token", token)
+      localStorage.setItem("user", JSON.stringify({ id, name, token }))
       navigate("/home")
     })
   }
@@ -49,7 +51,7 @@ export default function SignInPage() {
           onChange={handleForm} 
           required 
         />
-        <button>Entrar</button>
+        <button type="submit">Entrar</button>
       </form>
 
       <Link to="/cadastro">
