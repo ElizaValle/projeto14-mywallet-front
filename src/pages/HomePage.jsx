@@ -3,15 +3,14 @@ import { BiExit } from "react-icons/bi"
 import { AiOutlineMinusCircle, AiOutlinePlusCircle } from "react-icons/ai"
 import { UserContext } from "../contexts/UserContext"
 import { useContext, useEffect, useState } from "react"
-import { TransactionContext } from "../contexts/TransactionContext"
 import apiOperations from "../services/apiOperations"
 import { Link } from "react-router-dom"
 import dayjs from "dayjs"
 
-export default function HomePage({ value, description }) {
+export default function HomePage({  }) {
   const [operations, setOperations] = useState([])
+  // const { _id, date, type, value, description } = op
   const { user } = useContext(UserContext)
-  const { operation } = useContext(TransactionContext)
 
   useEffect(getOperationsList, [])  // executa a função uma única vez qdo a tela abre
 
@@ -28,6 +27,15 @@ export default function HomePage({ value, description }) {
     })
   }
 
+  function calculateBalance() {
+    const sum = operations.reduce((accumulatedTotal, currentValue) => (
+      currentValue.type === "income" ? accumulatedTotal + currentValue : accumulatedTotal - currentValue, 0
+    ))
+    return sum.toFixed(2)
+  }
+
+  const totalBalance = operations && calculateBalance()
+
   return (
     <HomeContainer>
       <Header>
@@ -36,41 +44,46 @@ export default function HomePage({ value, description }) {
       </Header>
 
       <TransactionsContainer>
-        {operations.length === 0 ? (
-          <StyledSubtitle>
+        {operations && operations.length === 0 && 
+          <>
             Não há registros de entrada ou saída
-          </StyledSubtitle>
-        ) : (
+          </>
+        }
+        {operations && operations.length > 0 && (
           <ul>
             {operations.map(op => (
-              <ListItemContainer key={op.id}>
+              <ListItemContainer key={op._id} operations={op} >
                 <div>
-                  <span>{dayjs.date()}/{dayjs.month() + 1}</span>
+                  <span>{dayjs(op.date).format("DD/MM")}</span>
                   <strong>{op.description}</strong>
                 </div>
-                <Value color={"negativo"}>{op.value}</Value>
+                <Value color={op.type === "expense" ? "negativo" : "positivo"}>
+                  {op.value.toFixed(2).toString().replace(".", ",")}
+                </Value>
               </ListItemContainer>
             ))}
           </ul>
+
         )}
        
-
         <article>
           <strong>Saldo</strong>
-          <Value color={"positivo"}>2880,00</Value>
+          <Value color={totalBalance > 0 ? "positivo" : "negativo"}>
+            {totalBalance.toString().replace(".", ",")}
+          </Value>
         </article>
       </TransactionsContainer>
 
 
       <ButtonsContainer>
         {/* arrumar essa rota */}
-        <Link to="/nova-transacao/:entrada">   
+        <Link to="/nova-transacao/entrada">   
           <button>
             <AiOutlinePlusCircle />
             <p>Nova <br /> entrada</p>
           </button>
         </Link>
-        <Link to="/nova-transacao/:saida"> 
+        <Link to="/nova-transacao/saida"> 
           <button>
             <AiOutlineMinusCircle />
             <p>Nova <br />saída</p>

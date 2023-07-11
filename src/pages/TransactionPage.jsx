@@ -1,12 +1,14 @@
 import { useContext, useState } from "react"
 import styled from "styled-components"
 import apiOperations from "../services/apiOperations"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import { UserContext } from "../contexts/UserContext"
 
-export default function TransactionsPage({ getOperationsList }) {
+export default function TransactionsPage({ operations, getOperationsList }) {
   const [form, setForm] = useState({ value: "", description: "" })
   const { user } = useContext(UserContext)
+  const { type } = useParams()
+  let typeOperation = type
   const navigate = useNavigate()
 
   function handleForm(e) {
@@ -18,7 +20,14 @@ export default function TransactionsPage({ getOperationsList }) {
 
     apiOperations.createOperations(user.token, form)
     .then(res => {
-      setForm({value: "", description: ""})
+
+      if(type === "entrada") {
+        typeOperation = "Entrada"
+      } else {
+        typeOperation = "Saída"
+      }
+      
+      setForm({ ...form, type: type === "entrada" ? "income" : "expense" })
       getOperationsList()
       navigate("/home")})
     .catch(err => alert(err.response.data.message))
@@ -26,7 +35,7 @@ export default function TransactionsPage({ getOperationsList }) {
 
   return (
     <TransactionsContainer>
-      <h1>Nova TRANSAÇÃO</h1>
+      <h1>Nova {typeOperation}</h1>
       <form onSubmit={handleOperation}>
         <input 
           name="value" 
@@ -44,7 +53,7 @@ export default function TransactionsPage({ getOperationsList }) {
           onChange={handleForm} 
           required
         />
-        <button type="submit">Salvar TRANSAÇÃO</button>
+        <button type="submit">Salvar {typeOperation}</button>
       </form>
     </TransactionsContainer>
   )
