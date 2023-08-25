@@ -1,8 +1,30 @@
 import styled from "styled-components"
 import { BiExit } from "react-icons/bi"
 import { AiOutlineMinusCircle, AiOutlinePlusCircle } from "react-icons/ai"
+import { useContext, useEffect, useState } from "react"
+import AuthContext from "../contexts/AuthContext"
+import { useNavigate } from "react-router-dom"
 
 export default function HomePage() {
+  const [operacao, setOperacao] = useState(localStorage.getItem("token"))
+  const { token } = useContext(AuthContext)
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+
+    if (!token) navigate("/")
+
+    axios.get(`${import.meta.env.VITE_API_URL}/operacao`, config)
+      .then(res => setOperacao(res.data))
+      .catch(err => console.log(err.response))
+
+  }, [])
+
   return (
     <HomeContainer>
       <Header>

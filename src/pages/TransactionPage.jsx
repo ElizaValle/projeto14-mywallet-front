@@ -1,6 +1,23 @@
+import { useContext, useEffect } from "react"
 import styled from "styled-components"
+import AuthContext from "../contexts/AuthContext"
+import { useNavigate } from "react-router-dom"
 
 export default function TransactionsPage() {
+  const { token } = useContext(AuthContext)
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+
+    if (!token) navigate("/")
+    
+  }, [])
+
   return (
     <TransactionsContainer>
       <h1>Nova TRANSAÇÃO</h1>
