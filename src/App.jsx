@@ -8,20 +8,21 @@ import AuthContext from "./contexts/AuthContext"
 import { useState } from "react"
 
 export default function App() {
-  const [token, setToken] = useState("")
+  const [token, setToken] = useState(localStorage.getItem("token"))
+  const [nomeUsuario, setNomeusuario] = useState(localStorage.getItem("nomeUsuario"))
 
   return (
     <PagesContainer>
-      <BrowserRouter>
-        <AuthContext.Provider value={{ token, setToken }}>
-          <Routes>
-            <Route path="/cadastro" element={<SignUpPage />} />
-            <Route path="/" element={<SignInPage />} />
-            <Route path="/home" element={<HomePage />} />
-            <Route path="/nova-transacao/:tipo" element={<TransactionsPage />} />
-          </Routes>
-        </AuthContext.Provider>
-      </BrowserRouter>
+      <AuthContext.Provider value={{ token, setToken, nomeUsuario, setNomeusuario }}>
+        <BrowserRouter>
+            <Routes>
+              <Route path="/cadastro" element={<SignUpPage />} />
+              <Route path="/" element={<SignInPage />} />
+              <Route path="/home" element={<HomePage />} />
+              <Route path="/nova-transacao/:tipo" element={<TransactionsPage />} />
+            </Routes>
+        </BrowserRouter>
+      </AuthContext.Provider>
     </PagesContainer>
   )
 }

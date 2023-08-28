@@ -3,10 +3,11 @@ import { Link, useNavigate } from "react-router-dom"
 import MyWalletLogo from "../components/MyWalletLogo"
 import AuthContext from "../contexts/AuthContext"
 import { useContext, useState } from "react"
+import axios from "axios"
 
 export default function SignInPage() {
   const [form, setForm] = useState({ email: "", senha: "" })
-  const { setToken } = useContext(AuthContext)
+  const { setToken, nomeUsuario } = useContext(AuthContext)
   const navigate = useNavigate()
 
   function handleForm(e) {
@@ -22,7 +23,7 @@ export default function SignInPage() {
         localStorage.setItem("token", res.data)
         navigate("/home")
       })
-      .catch(err => console.log(err.response))
+      .catch(err => console.log(err))
   }
 
   return (
@@ -30,6 +31,7 @@ export default function SignInPage() {
       <form onSubmit={handleLogin}>
         <MyWalletLogo />
         <input 
+          name="email"
           placeholder="E-mail" 
           type="email"
           value={form.email}
@@ -37,9 +39,10 @@ export default function SignInPage() {
           required 
         />
         <input 
+          name="senha"
           placeholder="Senha" 
           type="password" 
-          autocomplete="new-password"
+          autoComplete="new-password"
           value={form.senha}
           onChange={handleForm}
           required

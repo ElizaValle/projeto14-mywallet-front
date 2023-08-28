@@ -4,66 +4,93 @@ import { AiOutlineMinusCircle, AiOutlinePlusCircle } from "react-icons/ai"
 import { useContext, useEffect, useState } from "react"
 import AuthContext from "../contexts/AuthContext"
 import { useNavigate } from "react-router-dom"
+import axios from "axios"
+import dayjs from "dayjs"
 
-export default function HomePage() {
-  const [operacao, setOperacao] = useState(localStorage.getItem("token"))
-  const { token } = useContext(AuthContext)
+export default function HomePage({ descricao }) {
+  const [transacao, setTransacao] = useState(undefined)
+  const { token, nomeUsuario, setToken, setNomeUsuario } = useContext(AuthContext)
+  const config = { headers: { Authorization: `Bearer ${token}` } }
   const navigate = useNavigate()
 
-  useEffect(() => {
-    const config = {
-      headers: {
-        Authorization: `Bearer ${token}`
+  console.log(nomeUsuario)
+
+  function logout() {
+    axios.post(`${process.env.VITE_API_URL}/logout`, {}, config)
+      .then(() => {
+        setToken(undefined)
+        setNomeUsuario(undefined)
+        localStorage.clear()
+        navigate("/")
+      })
+      .catch(err => alert(err.response.data))
+  }
+
+  function saldo() {
+    let saldo = 0
+
+    transacao.forEach(t => {
+      if (t.tipo === "proventos") {
+        saldo += t.valor
+      } else if (t.tipo === "despesas") {
+        saldo -= t.valor
       }
-    }
+    })
 
-    if (!token) navigate("/")
+    return saldo
+  }
 
-    axios.get(`${import.meta.env.VITE_API_URL}/operacao`, config)
-      .then(res => setOperacao(res.data))
+  const saldoTotal = transacao && saldo()
+
+  function exibeTransacao() {
+    axios.get(`${import.meta.env.VITE_API_URL}/nova-transacao`, config)
+      .then(res => setTransacao(res.data))
       .catch(err => console.log(err.response))
+  }
 
+  useEffect(() => {
+    if (!token) navigate("/")
+    exibeTransacao()
   }, [])
 
   return (
     <HomeContainer>
       <Header>
-        <h1>Olá, Fulano</h1>
-        <BiExit />
+        <h1>Olá, {nomeUsuario}</h1>
+        <BiExit onClick={logout} />
       </Header>
 
       <TransactionsContainer>
-        <ul>
-          <ListItemContainer>
-            <div>
-              <span>30/11</span>
-              <strong>Almoço mãe</strong>
-            </div>
-            <Value color={"negativo"}>120,00</Value>
-          </ListItemContainer>
-
-          <ListItemContainer>
-            <div>
-              <span>15/11</span>
-              <strong>Salário</strong>
-            </div>
-            <Value color={"positivo"}>3000,00</Value>
-          </ListItemContainer>
-        </ul>
-
-        <article>
-          <strong>Saldo</strong>
-          <Value color={"positivo"}>2880,00</Value>
-        </article>
+        {transacao && transacao.length === 0 && <>Não há registros de entrada e saída</>}
+        {transacao && transacao.length > 0 && (
+          <>
+            <ul>
+              <ListItemContainer>
+                {transacao.map(t =>
+                  <>
+                    <div key={t._id}>
+                      <span>{dayjs(date).format("DD/MM")}</span>
+                      <strong>{descricao}</strong>
+                    </div>
+                    <Value color={saldoTotal > 0 ? "positivo" : "negativo"}>{saldoTotal}</Value>
+                  </>
+                )} 
+              </ListItemContainer>
+            </ul>
+            <article>
+              <strong>Saldo</strong>
+              <Value color={saldoTotal > 0 ? "positivo" : "negativo"}>{saldoTotal}</Value>
+            </article>
+          </>          
+        )}
       </TransactionsContainer>
 
-
       <ButtonsContainer>
-        <button>
+        <button onClick={() => navigate("/nova-transacao/entrada")}>
           <AiOutlinePlusCircle />
           <p>Nova <br /> entrada</p>
         </button>
-        <button>
+        <button onClick={() => navigate("/nova-transacao/saida")}>
           <AiOutlineMinusCircle />
           <p>Nova <br />saída</p>
         </button>

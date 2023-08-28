@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom"
 import styled from "styled-components"
 import MyWalletLogo from "../components/MyWalletLogo"
 import { useState } from "react"
+import axios from "axios"
 
 export default function SignUpPage() {
   const [form, setForm] = useState({ nome: "", email: "", senha: "", confirmeSenha: "" })
@@ -22,7 +23,7 @@ export default function SignUpPage() {
     axios.post(`${import.meta.env.VITE_API_URL}/sign-up`, form)
       .then(res => navigate("/"))
       .catch(err => {
-        console.log(err.response.data)
+        //console.log(err)
         alert(err.response.data.message)
       })
   }
@@ -32,6 +33,7 @@ export default function SignUpPage() {
       <form onSubmit={handleSignUp}>
         <MyWalletLogo />
         <input 
+          name="nome"
           placeholder="Nome" 
           type="text"
           value={form.nome}
@@ -39,6 +41,7 @@ export default function SignUpPage() {
           required 
         />
         <input 
+          name="email"
           placeholder="E-mail" 
           type="email"
           value={form.email}
@@ -46,17 +49,19 @@ export default function SignUpPage() {
           required 
         />
         <input 
+          name="senha"
           placeholder="Senha" 
           type="password" 
-          autocomplete="new-password"
+          autoComplete="new-password"
           value={form.senha}
           onChange={handleForm} 
           required 
         />
         <input 
+          name="confirmeSenha"
           placeholder="Confirme a senha" 
           type="password" 
-          autocomplete="new-password"
+          autoComplete="new-password"
           value={form.confirmeSenha}
           onChange={handleForm} 
           required 
