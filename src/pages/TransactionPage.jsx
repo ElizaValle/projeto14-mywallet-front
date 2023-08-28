@@ -3,6 +3,7 @@ import styled from "styled-components"
 import AuthContext from "../contexts/AuthContext"
 import { useNavigate, useParams } from "react-router-dom"
 import { useState } from "react"
+import axios from "axios"
 
 export default function TransactionsPage() {
   const [form, setForm] = useState({ valor: "", descricao: "" })
@@ -20,15 +21,10 @@ export default function TransactionsPage() {
     e.preventDefault()
     const body = { ...form, tipo: tipo === "entrada" ? "proventos" : "despesas" }
 
-    axios.post(`${process.env.VITE_API_URL}/nova-transacao`, body, config)
-      .then(res => navigate("/"))
-      .cathc(err => alert(err.response.data))
+    axios.post(`${import.meta.env.VITE_API_URL}/nova-transacao`, body, config)
+      .then(res => navigate("/home"))
+      .catch(err => alert(err.response.data))
   }
-
-  useEffect(() => {
-    if (!token) navigate("/")
-    handleTransaction()
-  }, [])
 
   return (
     <TransactionsContainer>
