@@ -41,6 +41,7 @@ export default function TransactionsPage() {
           value={form.valor}
           onChange={handleForm}
           required
+          data-test="registry-amount-input"
         />
         <input 
           name="descricao"
@@ -49,8 +50,9 @@ export default function TransactionsPage() {
           value={form.descricao}
           onChange={handleForm}
           required
+          data-test="registry-name-input"
         />
-        <button type="submit">Salvar {transacao}</button>
+        <button type="submit" data-test="registry-save">Salvar {transacao}</button>
       </form>
     </TransactionsContainer>
   )

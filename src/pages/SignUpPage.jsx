@@ -39,6 +39,7 @@ export default function SignUpPage() {
           value={form.nome}
           onChange={handleForm} 
           required 
+          data-test="name"
         />
         <input 
           name="email"
@@ -47,6 +48,7 @@ export default function SignUpPage() {
           value={form.email}
           onChange={handleForm} 
           required 
+          data-test="email"
         />
         <input 
           name="senha"
@@ -56,6 +58,7 @@ export default function SignUpPage() {
           value={form.senha}
           onChange={handleForm} 
           required 
+          data-test="password"
         />
         <input 
           name="confirmeSenha"
@@ -65,8 +68,9 @@ export default function SignUpPage() {
           value={form.confirmeSenha}
           onChange={handleForm} 
           required 
+          data-test="conf-password"
         />
-        <button type="submit">Cadastrar</button>
+        <button type="submit" data-test="sign-up-submit">Cadastrar</button>
       </form>
 
       <Link to="/">

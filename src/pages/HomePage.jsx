@@ -7,13 +7,11 @@ import { useNavigate } from "react-router-dom"
 import axios from "axios"
 import dayjs from "dayjs"
 
-export default function HomePage({ descricao }) {
+export default function HomePage() {
   const [transacao, setTransacao] = useState(undefined)
   const { token, nomeUsuario, setToken, setNomeUsuario } = useContext(AuthContext)
   const config = { headers: { Authorization: `Bearer ${token}` } }
   const navigate = useNavigate()
-
-  console.log(nomeUsuario)
 
   function logout() {
     axios.post(`${process.env.VITE_API_URL}/logout`, {}, config)
@@ -43,7 +41,7 @@ export default function HomePage({ descricao }) {
   const saldoTotal = transacao && saldo()
 
   function exibeTransacao() {
-    axios.get(`${import.meta.env.VITE_API_URL}/nova-transacao`, config)
+    axios.get(`${import.meta.env.VITE_API_URL}/transacao`, config)
       .then(res => setTransacao(res.data))
       .catch(err => console.log(err.response))
   }
@@ -56,8 +54,8 @@ export default function HomePage({ descricao }) {
   return (
     <HomeContainer>
       <Header>
-        <h1>Olá, {nomeUsuario}</h1>
-        <BiExit onClick={logout} />
+        <h1 data-test="user-name">Olá, {nomeUsuario}</h1>
+        <BiExit onClick={logout} data-test="logout" />
       </Header>
 
       <TransactionsContainer>
@@ -69,28 +67,28 @@ export default function HomePage({ descricao }) {
                 {transacao.map(t =>
                   <>
                     <div key={t._id}>
-                      <span>{dayjs(date).format("DD/MM")}</span>
-                      <strong>{descricao}</strong>
+                      <span data-test="registry-name">{dayjs(t.date).format("DD/MM")}</span>
+                      <strong data-test="registry-name">{t.descricao}</strong>
                     </div>
-                    <Value color={saldoTotal > 0 ? "positivo" : "negativo"}>{saldoTotal}</Value>
+                    <Value color={saldoTotal > 0 ? "positivo" : "negativo"} data-test="registry-amount">{saldoTotal}</Value>
                   </>
                 )} 
               </ListItemContainer>
             </ul>
             <article>
               <strong>Saldo</strong>
-              <Value color={saldoTotal > 0 ? "positivo" : "negativo"}>{saldoTotal}</Value>
+              <Value color={saldoTotal > 0 ? "positivo" : "negativo"} data-test="total-amount">{saldoTotal}</Value>
             </article>
           </>          
         )}
       </TransactionsContainer>
 
       <ButtonsContainer>
-        <button onClick={() => navigate("/nova-transacao/entrada")}>
+        <button onClick={() => navigate("/nova-transacao/entrada")} data-test="new-income">
           <AiOutlinePlusCircle />
           <p>Nova <br /> entrada</p>
         </button>
-        <button onClick={() => navigate("/nova-transacao/saida")}>
+        <button onClick={() => navigate("/nova-transacao/saida")} data-test="new-expense">
           <AiOutlineMinusCircle />
           <p>Nova <br />saída</p>
         </button>
@@ -157,7 +155,6 @@ const Value = styled.div`
   color: ${(props) => (props.color === "positivo" ? "green" : "red")};
 `
 const ListItemContainer = styled.li`
-  display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;

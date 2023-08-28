@@ -9,11 +9,11 @@ import { useState } from "react"
 
 export default function App() {
   const [token, setToken] = useState(localStorage.getItem("token"))
-  const [nomeUsuario, setNomeusuario] = useState(localStorage.getItem("nomeUsuario"))
+  const [nomeUsuario, setNomeUsuario] = useState(localStorage.getItem("nomeUsuario"))
 
   return (
     <PagesContainer>
-      <AuthContext.Provider value={{ token, setToken, nomeUsuario, setNomeusuario }}>
+      <AuthContext.Provider value={{ token, setToken, nomeUsuario, setNomeUsuario }}>
         <BrowserRouter>
             <Routes>
               <Route path="/cadastro" element={<SignUpPage />} />

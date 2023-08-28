@@ -7,7 +7,7 @@ import axios from "axios"
 
 export default function SignInPage() {
   const [form, setForm] = useState({ email: "", senha: "" })
-  const { setToken, nomeUsuario } = useContext(AuthContext)
+  const { setToken, setNomeUsuario } = useContext(AuthContext)
   const navigate = useNavigate()
 
   function handleForm(e) {
@@ -19,7 +19,9 @@ export default function SignInPage() {
 
     axios.post(`${import.meta.env.VITE_API_URL}/sign-in`, form)
       .then((res) => {
-        setToken(res.data)
+        console.log(res.data)
+        setToken(res.data.token)
+        setNomeUsuario(res.data.nomeUsuario)
         localStorage.setItem("token", res.data)
         navigate("/home")
       })
@@ -37,6 +39,7 @@ export default function SignInPage() {
           value={form.email}
           onChange={handleForm}
           required 
+          data-test="email"
         />
         <input 
           name="senha"
@@ -46,8 +49,9 @@ export default function SignInPage() {
           value={form.senha}
           onChange={handleForm}
           required
+          data-test="password"
         />
-        <button type="submit">Entrar</button>
+        <button type="submit" data-test="sign-in-submit">Entrar</button>
       </form>
 
       <Link to="/cadastro">
